@@ -1,76 +1,116 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../lib/supabaseClient'
+import { logoBase64 } from '../assets/logo'
+import {
+  IconeDashboard,
+  IconeEmpreendimentos,
+  IconeUnidades,
+  IconeRelatorios,
+  IconeConfiguracoes,
+} from '../assets/icones'
 
-export default function Login() {
-  const { entrar } = useAuth()
+const MODULOS = [
+  { path: '/', label: 'Dashboard', Icone: IconeDashboard },
+  { path: '/empreendimentos', label: 'Empreendimentos', Icone: IconeEmpreendimentos },
+  { path: '/unidades', label: 'Unidades', Icone: IconeUnidades },
+  { path: '/relatorios', label: 'Relatórios', Icone: IconeRelatorios },
+  { path: '/configuracoes', label: 'Configurações', Icone: IconeConfiguracoes },
+]
+
+export default function Layout() {
+  const { perfil, sair } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)
+  const [alertasNaoLidos, setAlertasNaoLidos] = useState(0)
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setErro('')
-    setEnviando(true)
+  useEffect(() => {
+    carregarContagemAlertas()
 
-    const { error } = await entrar(email, senha)
+    const canal = supabase
+      .channel('alertas-contagem')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'alertas' }, () => {
+        carregarContagemAlertas()
+      })
+      .subscribe()
 
-    if (error) {
-      setErro('E-mail ou senha incorretos.')
-      setEnviando(false)
-      return
+    return () => {
+      supabase.removeChannel(canal)
     }
+  }, [])
 
-    navigate('/', { replace: true })
+  async function carregarContagemAlertas() {
+    const { count } = await supabase
+      .from('alertas')
+      .select('id', { count: 'exact', head: true })
+      .eq('lido', false)
+
+    setAlertasNaoLidos(count || 0)
   }
 
+  async function handleSair() {
+    await sair()
+    navigate('/login')
+  }
+
+  const iniciais = perfil?.nome_completo
+    ? perfil.nome_completo
+        .split(' ')
+        .slice(0, 2)
+        .map((p) => p[0])
+        .join('')
+        .toUpperCase()
+    : '?'
+
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-brand">
-          <div className="login-logo">L+</div>
-          <p className="login-title">Legaliza+</p>
-          <p className="login-subtitle">Sistema de legalização de empreendimentos</p>
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="topbar-left">
+          <img src={logoBase64} alt="Grupo LL" className="topbar-logo" />
+          <span className="topbar-divisor" />
+          <span className="topbar-empresa">Sistema de legalização</span>
         </div>
-
-        <form onSubmit={handleSubmit} className="login-form">
-          <label className="login-label">
-            E-mail
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              placeholder="seu.email@empresa.com"
-            />
-          </label>
-
-          <label className="login-label">
-            Senha
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-              autoComplete="current-password"
-              placeholder="••••••••"
-            />
-          </label>
-
-          {erro && <p className="login-erro">{erro}</p>}
-
-          <button type="submit" className="login-botao" disabled={enviando}>
-            {enviando ? 'Entrando...' : 'Entrar'}
+        <div className="topbar-right">
+          <button
+            className="topbar-alertas"
+            onClick={() => navigate('/?aba=alertas')}
+            aria-label={`${alertasNaoLidos} alertas não lidos`}
+          >
+            <i className="ti ti-bell" aria-hidden="true" />
+            {alertasNaoLidos > 0 && <span className="badge-alertas">{alertasNaoLidos}</span>}
           </button>
-        </form>
+          <div className="topbar-usuario">
+            <span className="avatar">{iniciais}</span>
+            <div className="topbar-usuario-info">
+              <span className="topbar-usuario-nome">{perfil?.nome_completo || '...'}</span>
+              <span className="topbar-usuario-perfil">{perfil?.perfil}</span>
+            </div>
+            <button className="topbar-sair" onClick={handleSair}>
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
 
-        <p className="login-rodape">
-          Não tem acesso? Peça ao administrador do sistema para criar sua conta.
-        </p>
-      </div>
+      <nav className="modulos-grid">
+        {MODULOS.map((m) => (
+          <NavLink
+            key={m.path}
+            to={m.path}
+            end={m.path === '/'}
+            className={({ isActive }) => `modulo-item ${isActive ? 'modulo-item-ativo' : ''}`}
+          >
+            <span className="modulo-icone-wrap">
+              <m.Icone />
+            </span>
+            <span className="modulo-label">{m.label}</span>
+          </NavLink>
+        ))}
+      </nav>
+
+      <main className="app-content">
+        <Outlet />
+      </main>
     </div>
   )
 }
