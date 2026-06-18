@@ -2,18 +2,22 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
+import { logoBase64 } from '../assets/logo'
+import {
+  IconeDashboard,
+  IconeEmpreendimentos,
+  IconeUnidades,
+  IconeRelatorios,
+  IconeConfiguracoes,
+} from '../assets/icones'
 
 const MODULOS = [
-  { path: '/', label: 'Dashboard', icone: 'chart-bar' },
-  { path: '/empreendimentos', label: 'Empreendimentos', icone: 'building-community' },
-  { path: '/unidades', label: 'Unidades', icone: 'home' },
-  { path: '/relatorios', label: 'Relatórios', icone: 'report' },
-  { path: '/configuracoes', label: 'Configurações', icone: 'settings' },
+  { path: '/', label: 'Dashboard', Icone: IconeDashboard },
+  { path: '/empreendimentos', label: 'Empreendimentos', Icone: IconeEmpreendimentos },
+  { path: '/unidades', label: 'Unidades', Icone: IconeUnidades },
+  { path: '/relatorios', label: 'Relatórios', Icone: IconeRelatorios },
+  { path: '/configuracoes', label: 'Configurações', Icone: IconeConfiguracoes },
 ]
-
-function Icone({ nome, className = '' }) {
-  return <i className={`ti ti-${nome} ${className}`} aria-hidden="true" />
-}
 
 export default function Layout() {
   const { perfil, sair } = useAuth()
@@ -62,8 +66,9 @@ export default function Layout() {
     <div className="app-shell">
       <header className="topbar">
         <div className="topbar-left">
-          <span className="topbar-brand">LEGALIZA+</span>
-          <span className="topbar-empresa">LL Empreendimentos Imobiliários</span>
+          <img src={logoBase64} alt="Grupo LL" className="topbar-logo" />
+          <span className="topbar-divisor" />
+          <span className="topbar-empresa">Sistema de legalização</span>
         </div>
         <div className="topbar-right">
           <button
@@ -71,7 +76,7 @@ export default function Layout() {
             onClick={() => navigate('/?aba=alertas')}
             aria-label={`${alertasNaoLidos} alertas não lidos`}
           >
-            <Icone nome="bell" />
+            <i className="ti ti-bell" aria-hidden="true" />
             {alertasNaoLidos > 0 && <span className="badge-alertas">{alertasNaoLidos}</span>}
           </button>
           <div className="topbar-usuario">
@@ -96,7 +101,7 @@ export default function Layout() {
             className={({ isActive }) => `modulo-item ${isActive ? 'modulo-item-ativo' : ''}`}
           >
             <span className="modulo-icone-wrap">
-              <Icone nome={m.icone} />
+              <m.Icone />
             </span>
             <span className="modulo-label">{m.label}</span>
           </NavLink>
