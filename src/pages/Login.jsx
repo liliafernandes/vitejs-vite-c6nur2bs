@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Login() {
   const { entrar } = useAuth()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
@@ -17,8 +19,11 @@ export default function Login() {
 
     if (error) {
       setErro('E-mail ou senha incorretos.')
+      setEnviando(false)
+      return
     }
-    setEnviando(false)
+
+    navigate('/', { replace: true })
   }
 
   return (
