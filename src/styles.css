@@ -35,17 +35,11 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.login-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #f2a93b;
-  color: #2b2926;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  margin: 0 auto 12px;
+.login-logo-img {
+  height: 64px;
+  width: auto;
+  display: block;
+  margin: 0 auto 16px;
 }
 
 .login-title {
@@ -117,7 +111,8 @@ body {
 }
 
 .topbar {
-  background: #2b2926;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e4dd;
   padding: 14px 24px;
   display: flex;
   align-items: center;
@@ -130,6 +125,18 @@ body {
   gap: 14px;
 }
 
+.topbar-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.topbar-divisor {
+  width: 1px;
+  height: 24px;
+  background: #e0ded5;
+}
+
 .topbar-brand {
   color: #fff;
   font-weight: 600;
@@ -138,7 +145,7 @@ body {
 }
 
 .topbar-empresa {
-  color: #cfcdc6;
+  color: #5f5e5a;
   font-size: 13px;
 }
 
@@ -153,7 +160,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: #f2a93b;
+  color: #854f0b;
   font-size: 18px;
   padding: 4px;
 }
@@ -195,21 +202,21 @@ body {
 }
 
 .topbar-usuario-nome {
-  color: #fff;
+  color: #2c2c2a;
   font-size: 13px;
   font-weight: 500;
 }
 
 .topbar-usuario-perfil {
-  color: #aaa;
+  color: #888780;
   font-size: 11px;
   text-transform: capitalize;
 }
 
 .topbar-sair {
   background: none;
-  border: 1px solid #555;
-  color: #ddd;
+  border: 1px solid #d8d6cd;
+  color: #5f5e5a;
   border-radius: 6px;
   padding: 4px 10px;
   font-size: 12px;
@@ -246,7 +253,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+}
+
+.modulo-icone-wrap svg {
+  width: 36px;
+  height: 36px;
 }
 
 .modulo-item-ativo .modulo-icone-wrap {
