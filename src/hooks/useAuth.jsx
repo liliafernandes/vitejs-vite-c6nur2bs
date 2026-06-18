@@ -51,8 +51,18 @@ export function AuthProvider({ children }) {
   }
 
   async function entrar(email, senha) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password: senha })
-    return { error }
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha })
+
+    if (error) {
+      return { error }
+    }
+
+    setSession(data.session)
+    if (data.session) {
+      await carregarPerfil(data.session.user.id)
+    }
+
+    return { error: null }
   }
 
   async function sair() {
